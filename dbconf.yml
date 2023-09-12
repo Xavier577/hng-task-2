@@ -4,7 +4,7 @@ test:
 
 development:
   driver: postgres
-  open: user=tsegen dbname=dbuser sslmode=disable
+  open: $DATABASE_URL dbname=hng_t2 sslmode=disable
 
 production:
   driver: postgres

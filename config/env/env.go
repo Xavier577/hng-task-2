@@ -1,11 +1,10 @@
 package env
 
 import (
-	"github.com/Xavier577/fiber-bolierplate/pkg/number"
+	"github.com/Xavier577/hng-task-2/pkg/types"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 const (
@@ -23,10 +22,9 @@ func init() {
 }
 
 type Value interface {
-	string | number.Number
+	string | types.Number
 }
 
-func Get[T Value](key string) T {
-	var a interface{} = os.Getenv(key)
-	return a.(T)
+func Get(key string) string {
+	return os.Getenv(key)
 }

@@ -1,10 +1,17 @@
 package users
 
-import "github.com/gofiber/fiber/v2"
-
-const UserRoute = "/users"
+import (
+	"github.com/Xavier577/hng-task-2/pkg/middlewares"
+	"github.com/gofiber/fiber/v2"
+)
 
 func SetRoutes(r fiber.Router) {
-	r.Use("/", getUser)
+	r.Post("/", middlewares.RequestBodyValidatorMiddleware(new(CreateUserDTO)), createUser)
+
+	r.Get("/:user_id", getUser)
+
+	r.Patch("/:user_id", middlewares.RequestBodyValidatorMiddleware(new(UpdateUserDTO)), updateUser)
+
+	r.Delete("/:user_id", deleteUser)
 
 }

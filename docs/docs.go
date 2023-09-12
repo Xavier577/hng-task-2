@@ -30,10 +30,10 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "petstore.swagger.io",
-	BasePath:         "/v2",
+	Host:             "",
+	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "Fiberapp Swagger Api",
+	Title:            "HNGx stage 2 task Api",
 	Description:      "This is a sample swagger doc.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

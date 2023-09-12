@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/Xavier577/fiber-bolierplate/config/env"
-	_ "github.com/Xavier577/fiber-bolierplate/docs"
-	"github.com/Xavier577/fiber-bolierplate/users"
+	"github.com/Xavier577/hng-task-2/config/env"
+	"github.com/Xavier577/hng-task-2/database/postgres"
+	_ "github.com/Xavier577/hng-task-2/docs"
+	"github.com/Xavier577/hng-task-2/users"
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -13,7 +14,7 @@ import (
 	"log"
 )
 
-// @title Fiberapp Swagger Api
+// @title HNGx stage 2 task Api
 // @version 1.0
 // @description This is a sample swagger doc.
 // @termsOfService http://swagger.io/terms/
@@ -25,25 +26,48 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host petstore.swagger.io
-// @BasePath /v2
+// @BasePath /api
 
 func setAppRoutes(a *fiber.App) {
 	api := a.Group("/api")
 
-	userRouter := api.Group(users.UserRoute)
-	users.SetRoutes(userRouter)
-
+	users.SetRoutes(api)
 }
 
 func setUpSwagger(a *fiber.App) {
+	a.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.Redirect("/api/docs", 301)
+	})
 
 	cfg := swagger.Config{
-		BasePath: "/api",
+		BasePath: "/api/",
 		FilePath: "./docs/swagger.json",
 	}
 
 	a.Use("/", swagger.New(cfg))
+
+}
+
+func init() {
+
+	SSLMode := env.Get("PG_SSL_MODE")
+
+	if SSLMode == "" {
+		SSLMode = "disable"
+	}
+
+	err := postgres.Connect(&postgres.PgConnectCfg{
+		DBName:   env.Get("PG_DATABASE"),
+		Host:     env.Get("PG_HOST"),
+		User:     env.Get("PG_USER"),
+		Password: env.Get("PG_PASSWORD"),
+		PORT:     env.Get("PG_PORT"),
+		SSLMode:  SSLMode,
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
@@ -61,11 +85,11 @@ func main() {
 		TimeFormat: "02-Jan-2006 15:04",
 	}))
 
-	setUpSwagger(app)
-
 	setAppRoutes(app)
 
-	ADDRESS := fmt.Sprintf(":%s", env.Get[string]("PORT"))
+	setUpSwagger(app)
+
+	ADDRESS := fmt.Sprintf(":%s", env.Get("PORT"))
 
 	err := app.Listen(ADDRESS)
 
