@@ -28,6 +28,11 @@ import (
 // @BasePath /api
 
 func setAppRoutes(a *fiber.App) {
+
+	a.Get("/Yae4gahthiGeechie_health", func(c *fiber.Ctx) error {
+		return c.SendStatus(200)
+	})
+
 	api := a.Group("/api")
 
 	users.SetRoutes(api)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"log"
 	"strings"
 )
 
@@ -29,7 +30,9 @@ func parseCfg(pgCfg *PgConnectCfg) string {
 	var cfgPairs []string
 
 	for key, val := range cfgMap {
-		cfgPairs = append(cfgPairs, fmt.Sprintf("%s=%v", key, val))
+		if val != nil && val != "" {
+			cfgPairs = append(cfgPairs, fmt.Sprintf("%s=%v", key, val))
+		}
 	}
 
 	return strings.Join(cfgPairs, " ")
@@ -39,6 +42,8 @@ func Connect(pgCfg *PgConnectCfg) error {
 	var connectionError error
 
 	dataSource := parseCfg(pgCfg)
+
+	log.Println(dataSource)
 
 	client, connectionError = sqlx.Connect("postgres", dataSource)
 
