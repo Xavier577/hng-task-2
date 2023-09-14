@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/Xavier577/hng-task-2/config/env"
 	"github.com/Xavier577/hng-task-2/database/postgres"
-	_ "github.com/Xavier577/hng-task-2/docs"
 	"github.com/Xavier577/hng-task-2/users"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
