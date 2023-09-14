@@ -39,7 +39,7 @@ func getUser(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(dtos.ResponseBody{StatusCode: fiber.StatusOK, Message: "success", Data: user})
+	return c.Status(fiber.StatusOK).JSON(dtos.ResponseBody{StatusCode: fiber.StatusOK, Message: "success", Data: user})
 }
 
 func createUser(c *fiber.Ctx) error {
@@ -55,7 +55,7 @@ func createUser(c *fiber.Ctx) error {
 		log.Fatal(queryErr)
 	}
 
-	return c.JSON(dtos.ResponseBody{StatusCode: fiber.StatusOK, Message: "success", Data: newlyCreatedUser})
+	return c.Status(fiber.StatusCreated).JSON(dtos.ResponseBody{StatusCode: fiber.StatusCreated, Message: "success", Data: newlyCreatedUser})
 }
 
 func updateUser(c *fiber.Ctx) error {
@@ -70,10 +70,29 @@ func updateUser(c *fiber.Ctx) error {
 	queryErr := postgres.Client().Get(&newlyCreatedUser, "UPDATE users SET name = $1 WHERE id = $2 RETURNING *", reqPayload.Name, userID)
 
 	if queryErr != nil {
-		log.Fatal(queryErr)
+		log.Println(queryErr)
+
+		ConnectionClosedError := errors.Is(queryErr, sql.ErrTxDone) || errors.Is(queryErr, sql.ErrNoRows)
+
+		var errMsg string
+
+		var statusCode int
+
+		if ConnectionClosedError {
+			statusCode = fiber.StatusBadRequest
+			errMsg = "Something went wrong"
+		} else {
+			statusCode = fiber.StatusBadRequest
+			errMsg = "Invalid user id"
+		}
+
+		return c.Status(statusCode).JSON(dtos.ResponseBody{
+			StatusCode: statusCode,
+			Message:    errMsg,
+		})
 	}
 
-	return c.JSON(dtos.ResponseBody{StatusCode: fiber.StatusOK, Message: "updated", Data: newlyCreatedUser})
+	return c.Status(fiber.StatusOK).JSON(dtos.ResponseBody{StatusCode: fiber.StatusOK, Message: "updated", Data: newlyCreatedUser})
 }
 
 func deleteUser(c *fiber.Ctx) error {
@@ -104,5 +123,5 @@ func deleteUser(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(dtos.ResponseBody{StatusCode: fiber.StatusOK, Message: "success"})
+	return c.Status(fiber.StatusOK).JSON(dtos.ResponseBody{StatusCode: fiber.StatusOK, Message: "success"})
 }

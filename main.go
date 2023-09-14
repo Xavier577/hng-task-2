@@ -6,7 +6,6 @@ import (
 	"github.com/Xavier577/hng-task-2/database/postgres"
 	_ "github.com/Xavier577/hng-task-2/docs"
 	"github.com/Xavier577/hng-task-2/users"
-	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -32,20 +31,6 @@ func setAppRoutes(a *fiber.App) {
 	api := a.Group("/api")
 
 	users.SetRoutes(api)
-}
-
-func setUpSwagger(a *fiber.App) {
-	a.Get("/", func(ctx *fiber.Ctx) error {
-		return ctx.Redirect("/api/docs", 301)
-	})
-
-	cfg := swagger.Config{
-		BasePath: "/api/",
-		FilePath: "./docs/swagger.json",
-	}
-
-	a.Use("/", swagger.New(cfg))
-
 }
 
 func init() {
@@ -86,8 +71,6 @@ func main() {
 	}))
 
 	setAppRoutes(app)
-
-	setUpSwagger(app)
 
 	ADDRESS := fmt.Sprintf(":%s", env.Get("PORT"))
 
